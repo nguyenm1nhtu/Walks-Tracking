@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Walks.API.Models.DTOs;
 using Walks.API.Models.Entities;
 using Walks.API.Repositories;
@@ -8,7 +9,7 @@ namespace Walks.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-
+    [Authorize]
     public class WalkController : ControllerBase
     {
         private readonly IMapper _mapper;
