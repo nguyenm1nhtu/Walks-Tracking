@@ -1,108 +1,87 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Walks.API.Data;
+using Walks.API.Models.DTOs;
 using Walks.API.Models.Entities;
+using Walks.API.Repositories;
+using AutoMapper;
 
-namespace Walks.Controllers
+namespace Walks.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class RegionController : ControllerBase
     {
-        private readonly WalksDbContext _context;
+        private readonly IRegionRepository _regionRepository;
+        private readonly IMapper _mapper;
 
-        public RegionController(WalksDbContext context)
+        public RegionController(IRegionRepository regionRepository, IMapper mapper)
         {
-            _context = context;
+            _regionRepository = regionRepository;
+            _mapper = mapper;
         }
 
         // GET: api/Region
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Region>>> GetRegions()
+        public async Task<ActionResult<IEnumerable<RegionDto>>> GetAll()
         {
-            return await _context.Regions.ToListAsync();
+            var regions = await _regionRepository.GetAllAsync();
+
+            return Ok(_mapper.Map<List<RegionDto>>(regions));
         }
 
         // GET: api/Region/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Region>> GetRegion(Guid id)
+        [HttpGet("{id:Guid}")]
+        public async Task<ActionResult<RegionDto>> GetById([FromRoute]Guid id)
         {
-            var region = await _context.Regions.FindAsync(id);
+            var region = await _regionRepository.GetByIdAsync(id);
 
             if (region == null)
             {
                 return NotFound();
             }
 
-            return region;
-        }
-
-        // PUT: api/Region/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutRegion(Guid id, Region region)
-        {
-            if (id != region.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(region).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RegionExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return Ok(_mapper.Map<RegionDto>(region));
         }
 
         // POST: api/Region
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Region>> PostRegion(Region region)
+        public async Task<ActionResult<RegionDto>> Create([FromBody] AddRegionRequestDto newRegion)
         {
-            _context.Regions.Add(region);
-            await _context.SaveChangesAsync();
+            var region = _mapper.Map<Region>(newRegion);
 
-            return CreatedAtAction("GetRegion", new { id = region.Id }, region);
+            region = await _regionRepository.CreateAsync(region);
+
+            var regionDto = _mapper.Map<RegionDto>(region);
+
+            return CreatedAtAction(nameof(GetById), new { id = regionDto.Id }, regionDto);
         }
 
-        // DELETE: api/Region/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRegion(Guid id)
+        // PUT: api/Region/5
+        [HttpPut("{id:Guid}")]
+        public async Task<IActionResult> Update([FromRoute]Guid id, [FromBody] UpdateRegionRequestDto updateRegion)
         {
-            var region = await _context.Regions.FindAsync(id);
+            var region = _mapper.Map<Region>(updateRegion);
+
+            region = await _regionRepository.UpdateAsync(id, region);
+
             if (region == null)
             {
                 return NotFound();
             }
 
-            _context.Regions.Remove(region);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return Ok(_mapper.Map<RegionDto>(region));
         }
 
-        private bool RegionExists(Guid id)
+        // DELETE: api/Region/5
+        [HttpDelete("{id:Guid}")]
+        public async Task<IActionResult> Delete([FromRoute]Guid id)
         {
-            return _context.Regions.Any(e => e.Id == id);
+            var region = await _regionRepository.DeleteAsync(id);
+            if (region == null)
+            {
+                return NotFound();
+            }
+
+            return NoContent();
         }
     }
 }

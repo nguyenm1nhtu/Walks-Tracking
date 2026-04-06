@@ -34,7 +34,7 @@ namespace Walks.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Difficulties");
+                    b.ToTable("Difficulties", (string)null);
                 });
 
             modelBuilder.Entity("Walks.API.Models.Entities.Region", b =>
@@ -56,7 +56,7 @@ namespace Walks.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Regions");
+                    b.ToTable("Regions", (string)null);
                 });
 
             modelBuilder.Entity("Walks.API.Models.Entities.Walk", b =>
@@ -91,7 +91,7 @@ namespace Walks.Migrations
 
                     b.HasIndex("RegionId");
 
-                    b.ToTable("Walks");
+                    b.ToTable("Walks", (string)null);
                 });
 
             modelBuilder.Entity("Walks.API.Models.Entities.Walk", b =>
