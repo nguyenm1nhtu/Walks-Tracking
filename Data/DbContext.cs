@@ -19,7 +19,7 @@ namespace Walks.API.Data
             modelBuilder.Entity<Difficulty>()
                 .Property(difficulty => difficulty.Name)
                 .HasConversion<string>()
-                .HasDefaultValue(DifficultyLevel.Easy)
+                .HasDefaultValue(DifficultyLevel.Beginner)
                 .HasMaxLength(20);
 
             base.OnModelCreating(modelBuilder);

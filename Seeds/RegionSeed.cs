@@ -11,7 +11,18 @@ namespace Walks.API.Seeds
             ("Hanoi", "HN", "https://images.example.com/regions/hanoi.jpg"),
             ("Da Nang", "DN", "https://images.example.com/regions/danang.jpg"),
             ("Sa Pa", "SP", "https://images.example.com/regions/sapa.jpg"),
-            ("Ninh Binh", "NB", "https://images.example.com/regions/ninh-binh.jpg")
+            ("Ninh Binh", "NB", "https://images.example.com/regions/ninh-binh.jpg"),
+            ("Ho Chi Minh City", "HCM", "https://images.example.com/regions/ho-chi-minh.jpg"),
+            ("Ha Long", "HL", "https://images.example.com/regions/ha-long.jpg"),
+            ("Phu Quoc", "PQ", "https://images.example.com/regions/phu-quoc.jpg"),
+            ("Hue", "HUE", "https://images.example.com/regions/hue.jpg"),
+            ("Da Lat", "DL", "https://images.example.com/regions/da-lat.jpg"),
+            ("Nha Trang", "NT", "https://images.example.com/regions/nha-trang.jpg"),
+            ("Vung Tau", "VT", "https://images.example.com/regions/vung-tau.jpg"),
+            ("Quy Nhon", "QN", "https://images.example.com/regions/quy-nhon.jpg"),
+            ("Can Tho", "CT", "https://images.example.com/regions/can-tho.jpg"),
+            ("Ha Giang", "HG", "https://images.example.com/regions/ha-giang.jpg"),
+            ("Buon Ma Thuot", "BMT", "https://images.example.com/regions/buon-ma-thuot.jpg")
         ];
 
         public static void Seed(WalksDbContext context)

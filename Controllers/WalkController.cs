@@ -19,11 +19,23 @@ namespace Walks.API.Controllers
             _mapper = mapper;
         }
 
-    // GET: api/Walk
+    // GET: api/Walk?filterOn=Name&filterQuery=Track&sortBy=LengthInKm&isAscending=false&pageNumber=1&pageSize=10
     [HttpGet]
-    public async Task<ActionResult<List<WalkDto>>> GetAll()
+    public async Task<ActionResult<List<WalkDto>>> GetAll(
+        [FromQuery] string? filterOn, 
+        [FromQuery] string? filterQuery, 
+        [FromQuery] string? sortBy, 
+        [FromQuery] bool isAscending, 
+        [FromQuery] int pageNumber = 1, 
+        [FromQuery] int pageSize = 10)
         {
-            var walks = await _walkRepository.GetAllAsync();
+            var walks = await _walkRepository.GetAllAsync(
+                filterOn, 
+                filterQuery, 
+                sortBy, 
+                isAscending, 
+                pageNumber, 
+                pageSize);
 
             return Ok(_mapper.Map<List<WalkDto>>(walks));
         } 

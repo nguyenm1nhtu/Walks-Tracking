@@ -5,6 +5,6 @@ namespace Walks.API.Models.Entities
     public class Difficulty
     {
         public Guid Id { get; set; }
-        public DifficultyLevel Name { get; set; } = DifficultyLevel.Easy;
+        public DifficultyLevel Name { get; set; } = DifficultyLevel.Beginner;
     }
 }

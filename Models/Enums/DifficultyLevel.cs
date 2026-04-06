@@ -2,8 +2,8 @@ namespace Walks.API.Models.Enums
 {
     public enum DifficultyLevel
     {
-        Easy,
+        Beginner,
         Immidiate,
-        Advanced
+        Avanced
     }
 }

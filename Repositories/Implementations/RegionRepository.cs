@@ -12,11 +12,38 @@ namespace Walks.API.Repositories
                 _context = context;
         }
 
-        public async Task<List<Region>> GetAllAsync()
+        public async Task<List<Region>> GetAllAsync(
+            string? filterOn = null, 
+            string? filterQuery = null, 
+            string? sortBy = null, 
+            bool? isAscending = true, 
+            int pageNumber = 1, 
+            int pageSize = 10)
         {
-            return await _context.Regions
-                .AsNoTracking()
-                .ToListAsync();
+            pageNumber = pageNumber < 1 ? 1 : pageNumber;
+            pageSize = pageSize < 1 ? 10 : Math.Min(pageSize, 100);
+
+            var regions = _context.Regions.AsNoTracking().AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filterOn) && !string.IsNullOrWhiteSpace(filterQuery))
+            {
+                if (filterOn.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    regions = regions.Where(r => EF.Functions.Like(r.Name, $"%{filterQuery}%"));
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                if (sortBy.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    regions = isAscending == true ? regions.OrderBy(r => r.Name) : regions.OrderByDescending(r => r.Name);
+                }
+            }
+
+            var skip = (pageNumber - 1) * pageSize;
+
+            return await regions.Skip(skip).Take(pageSize).ToListAsync();
         }
 
         public async Task<Region?> GetByIdAsync(Guid id)
