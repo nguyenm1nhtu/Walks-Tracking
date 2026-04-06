@@ -44,7 +44,7 @@ namespace Walks.API.Controllers
 
         // POST: api/Region
         [HttpPost]
-        public async Task<ActionResult<RegionDto>> Create([FromBody] AddRegionRequestDto newRegion)
+        public async Task<ActionResult<RegionDto>> Create([FromBody] AddRegionDto newRegion)
         {
             var region = _mapper.Map<Region>(newRegion);
 

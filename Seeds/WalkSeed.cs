@@ -1,24 +1,26 @@
 using Microsoft.EntityFrameworkCore;
 using Walks.API.Data;
+using Walks.API.Models.Enums;
 using Walks.API.Models.Entities;
 
 namespace Walks.API.Seeds
 {
     public static class WalkSeed
     {
-        private static readonly (string Name, string Description, double LengthInKm, string? WalkImageUrl, string DifficultyName, string RegionCode)[] Walks =
+        private static readonly (string Name, string Description, double LengthInKm, string? WalkImageUrl, DifficultyLevel DifficultyName, string RegionCode)[] Walks =
         [
-            ("West Lake Morning Loop", "A short, easy walk around West Lake.", 5.2, "https://images.example.com/walks/west-lake-loop.jpg", "Easy", "HN"),
-            ("Marble Mountains Trail", "A scenic medium route with stairs and viewpoints.", 8.4, "https://images.example.com/walks/marble-mountains.jpg", "Medium", "DN"),
-            ("Fansipan Ridge Trek", "A long, challenging mountain trek.", 14.8, "https://images.example.com/walks/fansipan-ridge.jpg", "Hard", "SP"),
-            ("Trang An Scenic Loop", "A longer expert walk through limestone valleys and rivers.", 10.7, "https://images.example.com/walks/trang-an-loop.jpg", "Expert", "NB")
+            ("West Lake Morning Loop", "A short, easy walk around West Lake.", 5.2, "https://images.example.com/walks/west-lake-loop.jpg", DifficultyLevel.Easy, "HN"),
+            ("Marble Mountains Trail", "A scenic medium route with stairs and viewpoints.", 8.4, "https://images.example.com/walks/marble-mountains.jpg", DifficultyLevel.Immidiate, "DN"),
+            ("Fansipan Ridge Trek", "A long, challenging mountain trek.", 14.8, "https://images.example.com/walks/fansipan-ridge.jpg", DifficultyLevel.Advanced, "SP"),
+            ("Trang An Scenic Loop", "A longer expert walk through limestone valleys and rivers.", 10.7, "https://images.example.com/walks/trang-an-loop.jpg", DifficultyLevel.Advanced, "NB")
         ];
 
         public static void Seed(WalksDbContext context)
         {
             var difficultyByName = context.Difficulties
                 .AsNoTracking()
-                .ToDictionary(x => x.Name, x => x.Id, StringComparer.OrdinalIgnoreCase);
+                .GroupBy(x => x.Name)
+                .ToDictionary(group => group.Key, group => group.First().Id);
 
             var regionByCode = context.Regions
                 .AsNoTracking()
@@ -71,7 +73,8 @@ namespace Walks.API.Seeds
             var difficultyByName = (await context.Difficulties
                 .AsNoTracking()
                 .ToListAsync(cancellationToken))
-                .ToDictionary(x => x.Name, x => x.Id, StringComparer.OrdinalIgnoreCase);
+                .GroupBy(x => x.Name)
+                .ToDictionary(group => group.Key, group => group.First().Id);
 
             var regionByCode = (await context.Regions
                 .AsNoTracking()

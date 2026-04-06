@@ -6,7 +6,12 @@ using Walks.API.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
 builder.Services.AddAutoMapper(cfg => cfg.AddProfile<AutoMapperProfiles>());
 
 // Swagger
@@ -40,7 +45,9 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("WalksConnectionS
         await dbContext.SaveChangesAsync(cancellationToken);
     }));
 
+// Repositories
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
+builder.Services.AddScoped<IWalkRepository, WalkRepository>();
 
 var app = builder.Build();
 
