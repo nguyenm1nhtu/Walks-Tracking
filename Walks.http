@@ -1,6 +1,6 @@
-@Walks_HostAddress = http://localhost:5067
+@Walks_HostAddress = http://localhost:7228
 
-GET {{Walks_HostAddress}}/weatherforecast/
+GET {{Walks_HostAddress}}/api/Regions
 Accept: application/json
 
 ###

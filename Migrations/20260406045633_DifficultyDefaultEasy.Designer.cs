@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Walks.API.Data;
 
@@ -11,9 +12,11 @@ using Walks.API.Data;
 namespace Walks.Migrations
 {
     [DbContext(typeof(WalksDbContext))]
-    partial class WalksDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260406045633_DifficultyDefaultEasy")]
+    partial class DifficultyDefaultEasy
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
