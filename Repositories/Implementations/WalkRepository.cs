@@ -1,7 +1,6 @@
 using Walks.API.Models.Entities;
 using Walks.API.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace Walks.API.Repositories
 {
@@ -21,13 +20,48 @@ namespace Walks.API.Repositories
             return walk;
         }
 
-        public async Task<List<Walk>> GetAllAsync()
+        public async Task<List<Walk>> GetAllAsync(
+            string? filterOn = null, 
+            string? filterQuery = null, 
+            string? sortBy = null, 
+            bool isAscending = true, 
+            int pageNumber = 1, 
+            int pageSize = 10)
         {
-            return await _context.Walks
+            pageNumber = pageNumber < 1 ? 1 : pageNumber;
+            pageSize = pageSize < 1 ? 10 : Math.Min(pageSize, 100);
+
+            var walks = _context.Walks
                 .AsNoTracking()
                 .Include(w => w.Difficulty)
                 .Include(w => w.Region)
-                .ToListAsync();
+                .AsQueryable();
+
+            // Filtering
+            if (!string.IsNullOrWhiteSpace(filterOn) && !string.IsNullOrWhiteSpace(filterQuery))
+            {
+                if (filterOn.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = walks.Where(w => EF.Functions.Like(w.Name, $"%{filterQuery}%"));
+                }
+            }
+
+            // Sorting
+            if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                if (sortBy.Equals("Name", StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = isAscending ? walks.OrderBy(w => w.Name): walks.OrderByDescending(w => w.Name);
+                } else if (sortBy.Equals("LengthInKm", StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = isAscending ? walks.OrderBy(w => w.LengthInKm) : walks.OrderByDescending(w => w.LengthInKm);
+                }
+            }
+
+            // Pagination
+            var skip = (pageNumber - 1) * pageSize;
+
+            return await walks.Skip(skip).Take(pageSize).ToListAsync();
         }
 
         public async Task<Walk?> GetByIdAsync(Guid id)
