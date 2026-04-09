@@ -9,7 +9,6 @@ namespace Walks.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class WalkController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -22,6 +21,7 @@ namespace Walks.API.Controllers
 
     // GET: api/Walk?filterOn=Name&filterQuery=Track&sortBy=LengthInKm&isAscending=false&pageNumber=1&pageSize=10
     [HttpGet]
+    [Authorize(Roles="Reader, Writer")]
     public async Task<ActionResult<List<WalkDto>>> GetAll(
         [FromQuery] string? filterOn, 
         [FromQuery] string? filterQuery, 
@@ -43,6 +43,7 @@ namespace Walks.API.Controllers
 
     // GET: api/Walk/5
     [HttpGet("{id:Guid}")]
+    [Authorize(Roles="Reader, Writer")]
     public async Task<ActionResult<WalkDto>> GetById([FromRoute]Guid id)
         {
             var walk = await _walkRepository.GetByIdAsync(id);
@@ -57,6 +58,7 @@ namespace Walks.API.Controllers
     
     // POST: api/Walk
     [HttpPost]
+    [Authorize(Roles="Writer")]
     public async Task<ActionResult<WalkDto>> Create([FromBody] AddWalkDto newWalk)
         {
             var walk =_mapper.Map<Walk>(newWalk);
@@ -68,6 +70,7 @@ namespace Walks.API.Controllers
 
     // PUT: api/Walk/5
     [HttpPut("{id:Guid}")]
+    [Authorize(Roles="Writer")]
     public async Task<ActionResult<WalkDto>> Update([FromRoute] Guid id, [FromBody] UpdateWalkRequestDto updatedWalk)
         {
             var walk = _mapper.Map<Walk>(updatedWalk);
@@ -84,6 +87,7 @@ namespace Walks.API.Controllers
 
     // DELETE: api/Walk/5
     [HttpDelete("{id:Guid}")]
+    [Authorize(Roles="Writer")]
     public async Task<ActionResult<WalkDto>> Delete([FromRoute] Guid id)
         {
             var walk = await _walkRepository.DeleteAsync(id);
