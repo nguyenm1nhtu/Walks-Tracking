@@ -1,6 +1,34 @@
-@Walks_HostAddress = http://localhost:7228
+@Walks_HostAddress = https://localhost:7228
 
 GET {{Walks_HostAddress}}/api/Regions
+Accept: application/json
+
+###
+
+POST {{Walks_HostAddress}}/api/Auth/Register
+Content-Type: application/json
+
+{
+  "username": "reader1@example.com",
+  "password": "123456",
+  "roles": ["Reader"]
+}
+
+###
+
+POST {{Walks_HostAddress}}/api/Auth/Login
+Content-Type: application/json
+
+{
+  "username": "reader1@example.com",
+  "password": "123456"
+}
+
+###
+
+@jwtToken = PASTE_YOUR_TOKEN_HERE
+GET {{Walks_HostAddress}}/api/Regions
+Authorization: Bearer {{jwtToken}}
 Accept: application/json
 
 ###

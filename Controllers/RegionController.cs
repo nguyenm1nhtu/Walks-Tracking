@@ -9,7 +9,6 @@ namespace Walks.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class RegionController : ControllerBase
     {
         private readonly IRegionRepository _regionRepository;
@@ -23,6 +22,7 @@ namespace Walks.API.Controllers
 
         // GET: api/Region
         [HttpGet]
+        [Authorize(Roles="Reader, Writer")]
         public async Task<ActionResult<IEnumerable<RegionDto>>> GetAll(
             [FromQuery] string? filterOn, 
             [FromQuery] string? filterQuery, 
@@ -44,6 +44,7 @@ namespace Walks.API.Controllers
 
         // GET: api/Region/5
         [HttpGet("{id:Guid}")]
+        [Authorize(Roles="Reader, Writer")]
         public async Task<ActionResult<RegionDto>> GetById([FromRoute]Guid id)
         {
             var region = await _regionRepository.GetByIdAsync(id);
@@ -58,6 +59,7 @@ namespace Walks.API.Controllers
 
         // POST: api/Region
         [HttpPost]
+        [Authorize(Roles="Writer")]
         public async Task<ActionResult<RegionDto>> Create([FromBody] AddRegionDto newRegion)
         {
             var region = _mapper.Map<Region>(newRegion);
@@ -71,6 +73,7 @@ namespace Walks.API.Controllers
 
         // PUT: api/Region/5
         [HttpPut("{id:Guid}")]
+        [Authorize(Roles="Writer")]
         public async Task<IActionResult> Update([FromRoute]Guid id, [FromBody] UpdateRegionRequestDto updateRegion)
         {
             var region = _mapper.Map<Region>(updateRegion);
@@ -87,6 +90,7 @@ namespace Walks.API.Controllers
 
         // DELETE: api/Region/5
         [HttpDelete("{id:Guid}")]
+        [Authorize(Roles="Writer")]
         public async Task<IActionResult> Delete([FromRoute]Guid id)
         {
             var region = await _regionRepository.DeleteAsync(id);
