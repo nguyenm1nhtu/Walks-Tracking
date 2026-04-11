@@ -1,3 +1,6 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Walks.API.Models.DTOs;
@@ -12,15 +15,18 @@ namespace Walks.API.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ITokenRepository _tokenRepository;
+        private readonly ITokenBlacklistRepository _tokenBlacklistRepository;
 
         public AuthController(
             UserManager<IdentityUser> userManager,
             RoleManager<IdentityRole> roleManager,
-            ITokenRepository tokenRepository)
+            ITokenRepository tokenRepository,
+            ITokenBlacklistRepository tokenBlacklistRepository)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _tokenRepository = tokenRepository;
+            _tokenBlacklistRepository = tokenBlacklistRepository;
         }
         
         // POST: api/Auth/Register
@@ -112,6 +118,29 @@ namespace Walks.API.Controllers
             {
                 JwtToken = jwtToken
             });
+        }
+
+        // POST: api/Auth/Logout
+        [HttpPost("Logout")]
+        [Authorize]
+        public ActionResult Logout()
+        {
+            var jti = User.FindFirstValue(JwtRegisteredClaimNames.Jti);
+            if (string.IsNullOrWhiteSpace(jti))
+            {
+                return BadRequest("Invalid token: missing jti claim.");
+            }
+
+            var expClaim = User.FindFirstValue(JwtRegisteredClaimNames.Exp);
+            if (!long.TryParse(expClaim, out var expUnix))
+            {
+                return BadRequest("Invalid token: missing exp claim.");
+            }
+
+            var expiresAtUtc = DateTimeOffset.FromUnixTimeSeconds(expUnix).UtcDateTime;
+            _tokenBlacklistRepository.Revoke(jti, expiresAtUtc);
+
+            return Ok("Logged out successfully.");
         }
     }
 }
