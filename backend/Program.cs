@@ -1,4 +1,6 @@
 using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -91,6 +93,29 @@ builder.Services
             
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key))
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = context =>
+            {
+                var blacklistRepository = context.HttpContext.RequestServices
+                    .GetRequiredService<ITokenBlacklistRepository>();
+
+                var jti = context.Principal?.FindFirstValue(JwtRegisteredClaimNames.Jti);
+                if (string.IsNullOrWhiteSpace(jti))
+                {
+                    context.Fail("Invalid token: missing jti claim.");
+                    return Task.CompletedTask;
+                }
+
+                if (blacklistRepository.IsRevoked(jti))
+                {
+                    context.Fail("Token has been revoked.");
+                }
+
+                return Task.CompletedTask;
+            }
+        };
     });
 
 // Swagger
@@ -148,10 +173,12 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AuthWalksConnectionString")));
 
 // Repositories
+builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IRegionRepository, RegionRepository>();
 builder.Services.AddScoped<IWalkRepository, WalkRepository>();
 builder.Services.AddScoped<IImageRepository, LocalImageRepository>();
 builder.Services.AddScoped<ITokenRepository, TokenRepository>();
+builder.Services.AddSingleton<ITokenBlacklistRepository, InMemoryTokenBlacklistRepository>();
 
 var app = builder.Build();
 
